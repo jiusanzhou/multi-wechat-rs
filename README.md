@@ -41,7 +41,12 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 或查看 [https://rustup.rs/](https://rustup.rs/)
 
 
-将代码Clone下来，并进入代码目录执行以下命令
+使用Cargo安装,
+```bash
+cargo install multi-wechat-rs
+```
+
+或代码Clone下来，并进入代码目录执行以下命令
 
 ```bash
 cargo build --release
