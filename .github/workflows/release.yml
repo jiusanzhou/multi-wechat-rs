@@ -15,10 +15,10 @@ jobs:
       matrix:
         target: [x86_64-pc-windows-msvc]
     steps:
-    - uses: actions/checkout@v2
-    - name: Rust Release binary
-      uses: rust-build/rust-build.action@v1.2.0
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        RUSTTARGET: ${{ matrix.target }}
+    # - uses: actions/checkout@v2
+    # - name: Rust Release binary
+    #   uses: rust-build/rust-build.action@v1.2.0
+    #   env:
+    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    #     RUSTTARGET: ${{ matrix.target }}
 

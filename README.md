@@ -58,6 +58,6 @@ cargo build --release
 
 ## ❤️ 鼓励
 
-*鼓励一下由 https://payone.wencai.app 赞助*
+<img width="200" src="https://payone.wencai.app/s/zoe.png" alt="鼓励一下由 https://payone.wencai.app 赞助">
 
-![鼓励一下由 https://payone.wencai.app 赞助](https://payone.wencai.app/s/zoe.png)
+*鼓励一下由 https://payone.wencai.app 赞助*
