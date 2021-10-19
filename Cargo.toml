@@ -1,5 +1,7 @@
 [package]
 name = "multi-wechat-rs"
+description = "一个完全由Rust实现的微信多开工具。"
+license = "AL2"
 version = "0.1.0"
 edition = "2018"
 
