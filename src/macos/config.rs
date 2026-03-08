@@ -2,7 +2,7 @@ use serde::Deserialize;
 use std::path::Path;
 
 /// Embedded default config from WeChatTweak
-const DEFAULT_CONFIG_JSON: &str = include_str!("config.json");
+const DEFAULT_CONFIG_JSON: &str = include_str!("../../configs/default.json");
 
 /// A version-specific patch configuration.
 #[derive(Debug, Clone, Deserialize)]

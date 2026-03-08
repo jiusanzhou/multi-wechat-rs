@@ -7,8 +7,8 @@ use std::io;
 use std::slice;
 use std::io::{Error, ErrorKind};
 
-use crate::winapi::*;
-use crate::utils::*;
+use super::winapi::*;
+use super::utils::*;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Handle {
@@ -161,7 +161,7 @@ pub fn get_system_handles(pid: u32) -> Result<Vec<Handle>, io::Error>{
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::process::*;
+    use super::process::*;
 
     #[test]
     fn check_status() {

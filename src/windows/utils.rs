@@ -13,7 +13,7 @@ use std::os::windows::ffi::OsStringExt;
 use std::convert::TryInto as _;
 use std::os::windows::ffi::OsStrExt as _;
 
-use crate::winapi::*;
+use super::winapi::*;
 
 #[inline(always)]
 pub fn get_last_error() -> io::Error {

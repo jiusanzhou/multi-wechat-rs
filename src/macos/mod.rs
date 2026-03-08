@@ -1,3 +1,4 @@
+pub mod cli;
 pub mod config;
 pub mod macho;
 pub mod patcher;

@@ -1,7 +1,7 @@
 #[allow(dead_code)]
 
-use crate::winapi::*;
-use crate::utils::*;
+use super::winapi::*;
+use super::utils::*;
 
 use std::io;
 use std::mem;

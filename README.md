@@ -124,14 +124,18 @@ src/
 ├── main.rs              # Entry point (platform-dispatched)
 ├── macos/
 │   ├── mod.rs           # Module root + error types
+│   ├── cli.rs           # CLI argument parsing + entry point
 │   ├── config.rs        # Patch config loading (embedded + external)
-│   ├── config.json      # Embedded WeChatTweak configs
 │   ├── macho.rs         # Mach-O parser + binary patcher
 │   └── patcher.rs       # Orchestrator: version → config → patch → codesign
-├── process.rs           # [Windows] Process enumeration
-├── system.rs            # [Windows] System handle query (NtQuerySystemInformation)
-├── utils.rs             # [Windows] Registry, privileges, process creation
-└── winapi.rs            # [Windows] Win32 API bindings
+└── windows/
+    ├── mod.rs           # Module root + entry point
+    ├── winapi.rs        # Win32 API bindings
+    ├── process.rs       # Process enumeration
+    ├── system.rs        # System handle query (NtQuerySystemInformation)
+    └── utils.rs         # Registry, privileges, process creation
+configs/
+└── default.json         # Embedded WeChatTweak patch configs
 ```
 
 ## 📝 Credits
