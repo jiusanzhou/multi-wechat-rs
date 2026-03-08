@@ -1,68 +1,150 @@
 <div align="center">
 
-<img src="wechat-rs.ico" />
+<img src="wechat-rs.ico" width="128" />
 
-## 微信小工具
+# WeChat Tweak RS
 
-**一个完全由Rust实现的微信~~工具~~多开。**
+**A cross-platform WeChat toolkit written in pure Rust.**
+
+Multi-instance · Anti-revoke · Auto-update bypass
+
+[![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows-blue)](#-platform-support)
+[![Language](https://img.shields.io/badge/language-Rust-orange)](https://www.rust-lang.org/)
+[![License](https://img.shields.io/badge/license-Apache--2.0-green)](LICENSE)
 
 </div>
 
 ---
 
-## ✨ 缘由
+## ✨ Features
 
-> 都2021年了，为什么还写个多开的小工具？
+| Feature | macOS | Windows |
+|---------|:-----:|:-------:|
+| 🔓 Multi-instance | ✅ Binary Patch | ✅ Mutex Kill |
+| 🛡️ Anti-revoke (message recall block) | ✅ | — |
+| 🚫 Disable auto-update | ✅ | — |
+| 🔏 Auto re-sign (ad-hoc codesign) | ✅ | — |
 
-多年前有个小工具为了快速实现，没有使用Rust开发，而是通过Golang实现注入和逻辑程序，C++实现的DLL。最近在用Rust重新实现，所以有必要进行测试和验证。
+## 🏗️ How It Works
 
-- 不会写🌚 C++
-- Golang 不能做 inline Hook
-- [Rust DLL注入工具](https://github.com/jiusanzhou/injrs)的预演
-- Rust DLL 进行 Hook 的预演
-- 有可能会有其他功能 🎉
+### macOS — Binary Patching
 
+Directly patches the WeChat Mach-O binary to modify specific functions:
 
+- **Multi-instance**: Patches the single-instance check to `return true` (`mov w0, #1; ret`)
+- **Anti-revoke**: Patches the message revoke handler to `return false` (`mov w0, #0; ret`)
+- **Disable updates**: Neutralizes all auto-update related functions
 
-## 👆 使用
+Supports both FAT (universal) and thin Mach-O binaries. Automatically re-signs with ad-hoc signature after patching.
 
-1. 可以[下载已编译好的程序](https://github.com/jiusanzhou/multi-wechat-rs/releases)，或通过下面的步骤自行编译。
+Patch configs are version-specific and embedded in the binary. Currently supports WeChat versions: `31927`, `31960`, `32281`, `32288`, `34371`.
 
-2. 双击运行程序会自动打开已安装的微信。
+### Windows — Runtime Mutex
 
-## 📦️ 编译
+Finds the running WeChat process, locates the `_WeChat_App_Instance_Identity_Mutex_Name` mutex handle via `NtQuerySystemInformation`, and closes it. Then launches a new WeChat instance.
 
-Rust环境准备。
+## 📦 Install
 
-Rust的可通过下面命令进行安装，
+### From Source
+
 ```bash
+# Install Rust: https://rustup.rs
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+
+# Clone and build
+git clone https://github.com/jiusanzhou/multi-wechat-rs.git
+cd multi-wechat-rs
+cargo build --release
 ```
-或查看 [https://rustup.rs/](https://rustup.rs/)
 
+### From Cargo
 
-使用Cargo安装,
 ```bash
 cargo install multi-wechat-rs
 ```
 
-或代码Clone下来，并进入代码目录执行以下命令
+### Pre-built Binaries
+
+Download from [Releases](https://github.com/jiusanzhou/multi-wechat-rs/releases).
+
+## 🚀 Usage
+
+### macOS
 
 ```bash
-cargo build --release
+# Patch WeChat (multi-instance + anti-revoke + disable updates)
+multi-wechat-rs patch
+
+# Specify custom app path
+multi-wechat-rs --app /Applications/WeChat.app patch
+
+# Use external config (for new WeChat versions)
+multi-wechat-rs --config ./config.json patch
+
+# List current and supported versions
+multi-wechat-rs versions
 ```
 
+### Windows
 
-## 📺 心得
+Double-click to run. It will automatically close the mutex lock and launch a new WeChat instance.
 
-- FFI很方便，比Golang实现便捷
-- Win32开发不熟悉，字符串处理等踩了坑
-- DLL 和 Injector 全纯Rust完全可行
-- 二进制大小满意，其中icon占据30kb
+## 🔧 Config Format
 
+Patch configs can be embedded or loaded externally. Format:
 
-## ❤️ 鼓励
+```json
+[
+  {
+    "version": "34371",
+    "targets": [
+      {
+        "identifier": "multiInstance",
+        "entries": [
+          { "arch": "arm64", "addr": "1001b82c4", "asm": "20008052C0035FD6" }
+        ]
+      },
+      {
+        "identifier": "revoke",
+        "entries": [
+          { "arch": "arm64", "addr": "103e7cd2c", "asm": "00008052C0035FD6" }
+        ]
+      }
+    ]
+  }
+]
+```
 
-<img width="200" src="https://payone.wencai.app/s/zoe.png" alt="鼓励一下由 https://payone.wencai.app 赞助">
+To add support for a new WeChat version, reverse-engineer the target function addresses and add a new entry.
 
-*鼓励一下由 https://payone.wencai.app 赞助*
+## 🏛️ Architecture
+
+```
+src/
+├── main.rs              # Entry point (platform-dispatched)
+├── macos/
+│   ├── mod.rs           # Module root + error types
+│   ├── config.rs        # Patch config loading (embedded + external)
+│   ├── config.json      # Embedded WeChatTweak configs
+│   ├── macho.rs         # Mach-O parser + binary patcher
+│   └── patcher.rs       # Orchestrator: version → config → patch → codesign
+├── process.rs           # [Windows] Process enumeration
+├── system.rs            # [Windows] System handle query (NtQuerySystemInformation)
+├── utils.rs             # [Windows] Registry, privileges, process creation
+└── winapi.rs            # [Windows] Win32 API bindings
+```
+
+## 📝 Credits
+
+- macOS binary patching approach inspired by [WeChatTweak](https://github.com/sunnyyoung/WeChatTweak)
+- Windows DLL injection toolkit: [injrs](https://github.com/jiusanzhou/injrs)
+
+## ❤️ Support
+
+<img width="200" src="https://payone.wencai.app/s/zoe.png" alt="Support via payone.wencai.app">
+
+*Support via [payone.wencai.app](https://payone.wencai.app)*
+
+## 📄 License
+
+[Apache-2.0](LICENSE)
